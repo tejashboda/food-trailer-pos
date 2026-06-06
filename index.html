@@ -101,13 +101,18 @@ function exportToGoogleSheets() {
       "&totalOrders=" + totalOrders +
       "&totalRevenue=" + totalRevenue;
 
-    fetch(url)   // GET request
-      .then(response => response.text())
-      .then(text => console.log("Response:", text))
-      .catch(err => console.error("Error:", err));
-  });
-  alert("Data sent to Google Sheets!");
-}
+fetch(url)
+  .then(response => response.json())
+  .then(data => {
+    console.log("Response:", data);
+    if (data.status === "success") {
+      alert("Data sent to Google Sheets!");
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(err => console.error("Error:", err));
+
   </script>
 </body>
 </html>
