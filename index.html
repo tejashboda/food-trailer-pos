@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Trailer POS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Food Trailer POS</h1>
+    <p>Tap + / - to build the order</p>
+    <div class="total">Total ₹0</div>
+    <div class="revenue">Total Revenue ₹0</div>
+  </header>
+
+  <div class="menu" id="menu"></div>
+
+  <div class="btn-container">
+    <button onclick="resetOrders()">Reset Orders</button>
+    <button onclick="exportToGoogleSheets()">Export to Google Sheets</button>
+  </div>
+
+  <script>
+  const items = [
+    { name: "Small Tea", price: 20, image: "images/small_tea2.webp" },
+    { name: "Large Tea", price: 25, image: "images/large_tea.webp" },
+    { name: "Green Tea", price: 25, image: "images/green_tea.webp" },
+    { name: "Sugar Free Tea", price: 25, image: "images/sugar_free_tea.png" },
+    { name: "Plain Dosa", price: 40, image: "images/plain_dosa.png" },
+    { name: "Masala Dosa", price: 50, image: "images/masala_dosa.png" },
+    { name: "Onion Dosa", price: 50, image: "images/onion_dosa.png" }
+  ];
+
+  const menuDiv = document.getElementById("menu");
+  const totalDiv = document.querySelector(".total");
+  const revenueDiv = document.querySelector(".revenue");
+
+  let totalOrders = 0;
+  let totalRevenue = 0;
+
+  const quantities = Array(items.length).fill(0);
+
+  // Render items with images + counters
+  items.forEach((item, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "menu-item";
+
+    itemDiv.innerHTML = `
+      <div class="item-info" style="display:flex;align-items:center;">
+        <img src="${item.image}" alt="${item.name}" 
+             style="width:40px;height:40px;margin-right:10px;border-radius:50%;object-fit:cover;">
+        <span>${item.name}</span> <span class="item-price">₹${item.price}</span>
+      </div>
+      <div class="quantity">
+        <button onclick="updateQuantity(${index}, -1)">-</button>
+        <span id="qty-${index}">0</span>
+        <button onclick="updateQuantity(${index}, 1)">+</button>
+      </div>
+    `;
+
+    menuDiv.appendChild(itemDiv);
+  });
+
+  function updateQuantity(index, change) {
+    quantities[index] = Math.max(0, quantities[index] + change);
+    document.getElementById(`qty-${index}`).textContent = quantities[index];
+    calculateTotals();
+  }
+
+  function calculateTotals() {
+    totalOrders = quantities.reduce((sum, qty) => sum + qty, 0);
+    totalRevenue = items.reduce((sum, item, i) => sum + item.price * quantities[i], 0);
+
+    totalDiv.textContent = `Total Orders: ${totalOrders}`;
+    revenueDiv.textContent = `Total Revenue ₹${totalRevenue}`;
+  }
+
+  function resetOrders() {
+    for (let i = 0; i < quantities.length; i++) {
+      quantities[i] = 0;
+      document.getElementById(`qty-${i}`).textContent = 0;
+    }
+    totalOrders = 0;
+    totalRevenue = 0;
+    totalDiv.textContent = "Total Orders: 0";
+    revenueDiv.textContent = "Total Revenue ₹0";
+  }
+
+  // ✅ Google Sheets integration
+function exportToGoogleSheets() {
+  const today = new Date().toLocaleDateString();
+  items.forEach((item, i) => {
+    const subtotal = item.price * quantities[i];
+    const url = "https://script.google.com/macros/s/AKfycbz1OSV0_kT-vXgiAYagyDztTcdG78d8bH0IfE1rj6S_X8VssygqOBipNJ4SEh2-YISi/exec" +
+      "?date=" + encodeURIComponent(today) +
+      "&item=" + encodeURIComponent(item.name) +
+      "&price=" + item.price +
+      "&quantity=" + quantities[i] +
+      "&subtotal=" + subtotal +
+      "&totalOrders=" + totalOrders +
+      "&totalRevenue=" + totalRevenue;
+
+    fetch(url)   // GET request
+      .then(response => response.text())
+      .then(text => console.log("Response:", text))
+      .catch(err => console.error("Error:", err));
+  });
+  alert("Data sent to Google Sheets!");
+}
+  </script>
+</body>
+</html>
