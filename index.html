@@ -92,7 +92,7 @@ function exportToGoogleSheets() {
   const today = new Date().toLocaleDateString();
   items.forEach((item, i) => {
     const subtotal = item.price * quantities[i];
-    const url = "https://script.google.com/macros/s/AKfycbz1OSV0_kT-vXgiAYagyDztTcdG78d8bH0IfE1rj6S_X8VssygqOBipNJ4SEh2-YISi/exec" +
+    const url = "https://script.google.com/macros/s/AKfycbw11A-GF3K5J162Mb-Fs7kGGoohfW3oB4xC_S8izUZH0zHuadVcqRGkV9jCkeThTfGs/exec" +
       "?date=" + encodeURIComponent(today) +
       "&item=" + encodeURIComponent(item.name) +
       "&price=" + item.price +
