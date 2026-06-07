@@ -88,32 +88,43 @@
   }
 
   // ✅ Google Sheets integration
+// ✅ Google Sheets integration
 function exportToGoogleSheets() {
   const today = new Date().toLocaleDateString();
-  items.forEach((item, i) => {
-    const subtotal = item.price * quantities[i];
-    const url = "https://script.google.com/macros/s/AKfycbz2WkoIKLT-lgnt7A2oZoV6sLp6I9yW_k5ZwDmFRZkNiIidYImpCjARMtQOQxZVakgA/exec" +
-      "?date=" + encodeURIComponent(today) +
-      "&item=" + encodeURIComponent(item.name) +
-      "&price=" + item.price +
-      "&quantity=" + quantities[i] +
-      "&subtotal=" + subtotal +
-      "&totalOrders=" + totalOrders +
-      "&totalRevenue=" + totalRevenue;
 
-fetch(url)
+  // Build a single payload with all items + totals
+  const payload = {
+    date: today,
+    totalOrders: totalOrders,
+    totalRevenue: totalRevenue,
+    items: items.map((item, i) => ({
+      name: item.name,
+      price: item.price,
+      quantity: quantities[i],
+      subtotal: item.price * quantities[i]
+    }))
+  };
+
+  // Send as POST request
+  fetch("https://script.google.com/macros/s/AKfycbz1OSV0_kT-vXgiAYagyDztTcdG78d8bH0IfE1rj6S_X8VssygqOBipNJ4SEh2-YISi/exec", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
   .then(response => response.json())
   .then(data => {
     console.log("Response:", data);
     if (data.status === "success") {
-      alert("Data sent to Google Sheets!");
+      alert("Data updated in Google Sheets!");
     } else {
       alert("Error: " + data.message);
     }
   })
   .catch(err => console.error("Error:", err));
-  })
 }
+
   </script>
 </body>
 </html>
