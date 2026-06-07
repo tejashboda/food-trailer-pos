@@ -89,8 +89,12 @@
 
   // ✅ Google Sheets integration
 // ✅ Google Sheets integration
-function exportToGoogleSheets() {
-  const today = new Date().toLocaleDateString();
+function exportToGoogleSheets()
+{
+  const today =
+  now.getFullYear() + "-" +
+  String(now.getMonth() + 1).padStart(2, "0") + "-" +
+  String(now.getDate()).padStart(2, "0");
 
   // Build a single payload with all items + totals
   const payload = {
@@ -117,8 +121,10 @@ function exportToGoogleSheets() {
   .then(data => {
     console.log("Response:", data);
     if (data.status === "success") {
-      alert("Data updated in Google Sheets!");
-    } else {
+  alert("Data updated in Google Sheets!");
+  resetOrders(); // Automatically clear counts after successful export
+}
+   else {
       alert("Error: " + data.message);
     }
   })
